@@ -36,19 +36,19 @@ var strip = require('strip-comment');
 strip(html);  // Strip js css and html comments.
 ```
 
-### js
+### .js
 ```js
 var js = 'var a = 3; // comment'
 strip.js(js);
 ```
 
-### css
+### .css
 ```js
 var css = 'h2 { /* comment */ font-size : 18px; }'
 strip.css(css);
 ```
 
-### html
+### .html
 ```js
 var html = '<!-- html comment --><div></div>'
 strip.html(html);
