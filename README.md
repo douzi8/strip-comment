@@ -2,6 +2,11 @@ strip-comment
 =============
 
 Strip js, css, and html comments.
+## Install
+```
+npm install strip-comment --save-dev
+```
+## demo
 ```html
 <style>
 p {

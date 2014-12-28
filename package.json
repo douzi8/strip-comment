@@ -1,6 +1,6 @@
 {
   "name": "strip-comment",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Strip js, css, and html comments",
   "main": "index.js",
   "scripts": {
