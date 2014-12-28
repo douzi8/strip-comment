@@ -1,0 +1,30 @@
+{
+  "name": "strip-comment",
+  "version": "1.0.1",
+  "description": "Strip js, css, or html comments",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/douzi8/strip-comment.git"
+  },
+  "author": "douzi <liaowei08@gmail.com>",
+  "keywords": [
+    "strip",
+    "comments",
+    "comment",
+    "remove"
+  ],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/douzi8/strip-comment/issues"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-jshint": "^0.10.0",
+    "mocha": "^2.0.1"
+  },
+  "homepage": "https://github.com/douzi8/strip-comment"
+}
