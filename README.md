@@ -40,11 +40,12 @@ var strip = require('strip-comment');
 
 strip(html);  // Strip js css and html comments.
 ```
-
+## API
 ### .js
 ```js
 var js = 'var a = 3; // comment'
 strip.js(js);
+strip.js(js, true);     // keep code lines
 ```
 
 ### .css

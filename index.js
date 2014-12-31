@@ -35,7 +35,7 @@ function strip(code) {
 // var str = '// not a comment';
 // var str = '/* not a comment */';
 // var reg = /dasda\/* */;
-strip.js = function(code) {
+strip.js = function(code, keepLine) {
   var isSingleQuote = false;
   var isDoubleQuote = false;
   var isReg = false;
@@ -64,8 +64,15 @@ strip.js = function(code) {
     }
 
     if (isReg) {
-      if (item === '/' && code[i - 1] != '\\') {
-        isReg = false;
+      if (item === '/') {
+        // fixed /\/|\\/ bug
+        if (code[i - 1] === '\\') {
+          if (code[i - 2] === '\\') {
+            isReg = false;
+          }
+        } else {
+          isReg = false;
+        }
       }
       continue;
     }
@@ -85,7 +92,14 @@ strip.js = function(code) {
         code[i + 1] = '';
         isBlockComment = false;
       }
-      code[i] = '';
+
+      if (keepLine) {
+        if ('\n\r'.indexOf(item) === -1) {
+          code[i] = '';
+        }
+      } else {
+        code[i] = '';
+      }
       continue;
     }
 

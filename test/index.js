@@ -7,6 +7,9 @@ function getPath(filepath) {
   return path.join(__dirname, filepath);
 }
 
+function writeFileSync(filepath, data) {
+  fs.writeFileSync(getPath(filepath), data, { encoding: 'utf8'});
+}
 
 describe('Remove comments', function() {
   var html = fs.readFileSync(getPath('demo/index.html'), { encoding: 'utf8' });
@@ -15,12 +18,13 @@ describe('Remove comments', function() {
   it('Strip html', function() {
     var ret = strip(html);
 
-    console.log(ret);
+    writeFileSync('demo/index.dest.html', ret);
   });
 
   it('Strip js', function() {
     var ret = strip.js(js);
 
-    console.log(ret);
+    writeFileSync('demo/index.dest.js', ret);
+    writeFileSync('demo/index.dest.line.js', strip.js(js, true));
   });
 });

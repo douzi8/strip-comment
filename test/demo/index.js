@@ -12,5 +12,10 @@ var c/*
 
 var reg2 = /.\/*.dasd*\//g;
 
+var reg = /\/|\\/;
+
+/* comemnt
+*/
+
 
 var reg3 = /\//;var b = "5";
