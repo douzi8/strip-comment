@@ -4,7 +4,7 @@ strip-comment
 Strip js, css, and html comments.
 ## Install
 ```
-npm install strip-comment --save-dev
+npm install strip-comment --save
 ```
 ## demo
 ```html

@@ -27,6 +27,25 @@ function strip(code) {
 
   return code;
 }
+// Filter var a = 1 / 1;
+function isRegCode(arr, i) {
+  var l = arr.length;
+  var newLine = ['\n', '\r'];
+
+  for (i++; i < l; i++) {
+    var item = arr[i];
+
+    if (newLine.indexOf(item) !== -1) {
+      break;
+    }
+
+    if (item === '/') {
+      return true;
+    }
+  }
+
+  return false;
+}
 
 /**
  * @description
@@ -119,7 +138,7 @@ strip.js = function(code, keepLine) {
         continue;
       }
 
-      isReg = true;
+      isReg = isRegCode(code, i);
     }
   }
 
