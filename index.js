@@ -37,7 +37,7 @@ function isRegCode(arr, i) {
     if (notEmpty.test(item)) break;
   }
 
-  return /[^\d\)]/.test(item);
+  return /[^\d\)\w\$]/.test(item);
 }
 
 /**
