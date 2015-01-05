@@ -27,24 +27,17 @@ function strip(code) {
 
   return code;
 }
-// Filter var a = 1 / 1;
+// Filter var a = 1 / 1, (1 + 1) / 1;
 function isRegCode(arr, i) {
-  var l = arr.length;
-  var newLine = ['\n', '\r'];
+  var notEmpty = /\S/;
+  var item = '';
 
-  for (i++; i < l; i++) {
-    var item = arr[i];
-
-    if (newLine.indexOf(item) !== -1) {
-      break;
-    }
-
-    if (item === '/') {
-      return true;
-    }
+  while(--i) {
+    item = arr[i];
+    if (notEmpty.test(item)) break;
   }
 
-  return false;
+  return /[^\d\)]/.test(item);
 }
 
 /**
