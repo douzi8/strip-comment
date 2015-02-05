@@ -151,7 +151,52 @@ strip.html = function(code) {
  * Strip css comments.
  */
 strip.css = function(code) {
-  return code.replace(/\/\*[\s\S]*?\*\//g, '');
+  var isSingleQuote = false;
+  var isDoubleQuote = false;
+  var isBlockComment = false;
+
+  code = code.split('');
+
+  for (var i = 0, l = code.length; i < l; i++) {
+    item = code[i];
+    if (!item) continue;
+
+    if (isSingleQuote) {
+      if (item === "'" && code[i - 1] !== '\\') {
+        isSingleQuote = false;
+      }
+      continue;
+    }
+
+    if (isDoubleQuote) {
+      if (item === '"' && code[i - 1] !== '\\') {
+        isDoubleQuote = false;
+      }
+      continue;
+    }
+
+    if (isBlockComment) {
+      if (item === '*' && code[i + 1] === '/') {
+        code[i + 1] = '';
+        isBlockComment = false;
+      }
+      code[i] = '';
+      continue;
+    }
+
+    isSingleQuote = code[i] === "'";
+    isDoubleQuote = code[i] === '"';
+
+    if (item === '/') {
+      if (code[i + 1] === '*') {
+        isBlockComment = true;
+        code[i] = '';
+        continue;
+      }
+    }
+  }
+
+  return code.join('');
 };
 
 module.exports = strip;
