@@ -187,12 +187,10 @@ strip.css = function(code) {
     isSingleQuote = code[i] === "'";
     isDoubleQuote = code[i] === '"';
 
-    if (item === '/') {
-      if (code[i + 1] === '*') {
-        isBlockComment = true;
-        code[i] = '';
-        continue;
-      }
+    if (item === '/' && code[i + 1] === '*') {
+      isBlockComment = true;
+      code[i] = '';
+      continue;
     }
   }
 
