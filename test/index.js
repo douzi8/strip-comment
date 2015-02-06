@@ -19,6 +19,7 @@ describe('Remove comments', function() {
     var ret = strip(html);
 
     writeFileSync('demo/index.dest.html', ret);
+    writeFileSync('demo/index.dest.line.html', strip(html, true));
   });
 
   it('Strip js', function() {

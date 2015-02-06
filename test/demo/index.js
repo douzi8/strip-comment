@@ -1,3 +1,4 @@
+// comment /* 123 */
 var a = 5  // comment
 var a = 4;
    // comment
@@ -14,11 +15,12 @@ var reg2 = /.\/*.dasd*\//g;
 
 var reg = /\/|\\/;
 
-/* comemnt
+c/* comemnt
 */
 
 
-var reg3 = /\//;var b = "5";
+var reg3 = /\//;
+var b = "5";
 
 var a = 3 /4; //
 var a = 3 /4; //注释

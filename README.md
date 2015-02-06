@@ -41,20 +41,35 @@ var strip = require('strip-comment');
 strip(html);  // Strip js css and html comments.
 ```
 ## API
-### .js
+### strip(code, keepLine)
+Strip html css and js comments
+  * {string} ``code`` required
+  * {boolean} ``keepLine`` [keepLine = false]  
+  Keep the source code lines
+
+### .js(code, keepLine)
+Strip js comments
+  * {string} ``code`` required
+  * {boolean} ``keepLine`` [keepLine = false] 
 ```js
 var js = 'var a = 3; // comment'
 strip.js(js);
 strip.js(js, true);     // keep code lines
 ```
 
-### .css
+### .css(code, keepLine)
+Strip css comments
+  * {string} ``code`` required
+  * {boolean} ``keepLine`` [keepLine = false] 
 ```js
 var css = 'h2 { /* comment */ font-size : 18px; }'
 strip.css(css);
 ```
 
-### .html
+### .html(code, keepLine)
+Strip html comments
+  * {string} ``code`` required
+  * {boolean} ``keepLine`` [keepLine = false]
 ```js
 var html = '<!-- html comment --><div></div>'
 strip.html(html);

@@ -1,12 +1,14 @@
-function strip(code) {
+var QuoteScanner = require('quote-scanner');
+
+function strip(code, keepLine) {
   // Remove html comment
-  code = strip.html(code);
+  code = strip.html(code, keepLine);
 
   // Remove css comment
   code = code.replace(
     /<style([^>]*)>([\s\S]+?)<\/style>/g,
     function(match, $1, $2) {
-      return '<style'+ $1 +'>' + strip.css($2) + '</style>';
+      return '<style'+ $1 +'>' + strip.css($2, keepLine) + '</style>';
     }
   );
 
@@ -21,23 +23,19 @@ function strip(code) {
         if (type[2] && type[2] !== 'text/javascript') return match;
       }
 
-      return '<script' + $1 + '>' + strip.js($2) + '</script>';
+      return '<script' + $1 + '>' + strip.js($2, keepLine) + '</script>';
     }
   );
 
   return code;
 }
-// Filter var a = 1 / 1, (1 + 1) / 1;
-function isRegCode(arr, i) {
-  var notEmpty = /\S/;
-  var item = '';
 
-  while(--i) {
-    item = arr[i];
-    if (notEmpty.test(item)) break;
+function blockReplace(comemnt, keepLine) {
+  if (keepLine) {
+    return comemnt.replace(/[^\r\n]/g, '');
+  } else {
+    return '';
   }
-
-  return /[^\d\)\w\$]/.test(item);
 }
 
 /**
@@ -48,153 +46,55 @@ function isRegCode(arr, i) {
 // var str = '/* not a comment */';
 // var reg = /dasda\/* */;
 strip.js = function(code, keepLine) {
-  var isSingleQuote = false;
-  var isDoubleQuote = false;
-  var isReg = false;
-  var isBlockComment = false;
-  var isLineComment = false;
-  var item;
- 
-  code = code.split('');
+  var qs = new QuoteScanner(code);
 
-  for (var i = 0, l = code.length; i < l; i++) {
-    item = code[i];
-    if (!item) continue;
-    
-    if (isSingleQuote) {
-      if (item === "'" && code[i - 1] !== '\\') {
-        isSingleQuote = false;
-      }
-      continue;
+  // Remove block comment
+  code = code.replace(/(^|[^\\])\/\*[\s\S]*?\*\//g, function(match, $1, offset) {
+    if (qs.isIn(offset + $1.length)) {
+      return match;
+    } else {
+      return $1 + blockReplace(match.slice($1.length), keepLine);
     }
+  });
 
-    if (isDoubleQuote) {
-      if (item === '"' && code[i - 1] !== '\\') {
-        isDoubleQuote = false;
-      }
-      continue;
+  qs = new QuoteScanner(code);
+
+  // Remove line comment
+  code = code.replace(/(^|[^\\])\/\/.*([\r\n])/g, function(match, $1, $2, offset) {
+    if (qs.isIn(offset + $1.length)) {
+      return match;
+    } else {
+      return $1 + $2;
     }
+  });
 
-    if (isReg) {
-      if (item === '/') {
-        // fixed /\/|\\/ bug
-        if (code[i - 1] === '\\') {
-          if (code[i - 2] === '\\') {
-            isReg = false;
-          }
-        } else {
-          isReg = false;
-        }
-      }
-      continue;
-    }
-
-    if (isLineComment) {
-      // Cann't remove line, sometimes the new line is a statement
-      if (item === '\n' || item === '\r') {
-        isLineComment = false;
-      } else {
-        code[i] = '';
-      }
-      continue;
-    }
-
-    if (isBlockComment) {
-      if (item === '*' && code[i + 1] === '/') {
-        code[i + 1] = '';
-        isBlockComment = false;
-      }
-
-      if (keepLine) {
-        if ('\n\r'.indexOf(item) === -1) {
-          code[i] = '';
-        }
-      } else {
-        code[i] = '';
-      }
-      continue;
-    }
-
-    isSingleQuote = code[i] === "'";
-    isDoubleQuote = code[i] === '"';
-
-    if (item == '/') {
-      if (code[i + 1] === '/') {
-        isLineComment = true;
-        code[i] = '';
-        continue;
-      }
-
-      if (code[i + 1] === '*') {
-        isBlockComment = true;
-        code[i] = '';
-        continue;
-      }
-
-      isReg = isRegCode(code, i);
-    }
-  }
-
-  return code.join('');
+  return code;
 };
 
 /**
  * @description
  * Strip html comments.
  */
-strip.html = function(code) {
-  return code.replace(/<!--[\s\S]*?-->/g, '');
+strip.html = function(code, keepLine) {
+  return code.replace(/<!--[\s\S]*?-->/g, function(match) {
+    return blockReplace(match, keepLine);
+  });
 };
 
 /**
  * @description
  * Strip css comments.
  */
-strip.css = function(code) {
-  var isSingleQuote = false;
-  var isDoubleQuote = false;
-  var isBlockComment = false;
+strip.css = function(code, keepLine) {
+  var qs = new QuoteScanner(code);
 
-  code = code.split('');
-
-  for (var i = 0, l = code.length; i < l; i++) {
-    item = code[i];
-    if (!item) continue;
-
-    if (isSingleQuote) {
-      if (item === "'" && code[i - 1] !== '\\') {
-        isSingleQuote = false;
-      }
-      continue;
+  return code.replace(/\/\*[\s\S]*?\*\//g, function(match, offset) {
+    if (qs.isIn(offset)) {
+      return match;
+    } else {
+      return blockReplace(match, keepLine);
     }
-
-    if (isDoubleQuote) {
-      if (item === '"' && code[i - 1] !== '\\') {
-        isDoubleQuote = false;
-      }
-      continue;
-    }
-
-    if (isBlockComment) {
-      if (item === '*' && code[i + 1] === '/') {
-        code[i + 1] = '';
-        isBlockComment = false;
-      }
-      code[i] = '';
-      continue;
-    }
-
-    isSingleQuote = code[i] === "'";
-    isDoubleQuote = code[i] === '"';
-
-    if (item === '/' && code[i + 1] === '*') {
-      isBlockComment = true;
-      code[i] = '';
-      continue;
-    }
-  }
-
-  return code.join('');
+  });
 };
 
 module.exports = strip;
