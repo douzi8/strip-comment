@@ -6,7 +6,11 @@ Strip js, css, and html comments.
 ```
 npm install strip-comment --save
 ```
-## demo
+### test
+```
+mocha
+```
+### demo
 ```html
 <style>
 p {
