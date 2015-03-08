@@ -1,4 +1,5 @@
-var QuoteScanner = require('quote-scanner');
+var JsScanner = require('./lib/js-scanner');
+var CssScaner = require('./lib/css-scanner');
 
 function strip(code, keepLine) {
   // Remove html comment
@@ -30,12 +31,26 @@ function strip(code, keepLine) {
   return code;
 }
 
-function blockReplace(comemnt, keepLine) {
-  if (keepLine) {
-    return comemnt.replace(/[^\r\n]/g, '');
-  } else {
-    return '';
-  }
+function scanner(obj, code, keepLine) {
+  var result = [];
+  var index = 0;
+  
+  obj.on('comment', function(match, start) {
+    var content = code.slice(index, start);
+
+    if (keepLine) {
+      content += match.replace(/[^\r\n]/g, ' ');
+    }
+
+    result.push(content);
+    index = start + match.length;
+  });
+
+  obj.scanner();
+
+  result.push(code.slice(index));
+
+  return result.join('');
 }
 
 /**
@@ -46,29 +61,9 @@ function blockReplace(comemnt, keepLine) {
 // var str = '/* not a comment */';
 // var reg = /dasda\/* */;
 strip.js = function(code, keepLine) {
-  var qs = new QuoteScanner(code);
-
-  // Remove block comment
-  code = code.replace(/(^|[^\\])\/\*[\s\S]*?\*\//g, function(match, $1, offset) {
-    if (qs.isIn(offset + $1.length)) {
-      return match;
-    } else {
-      return $1 + blockReplace(match.slice($1.length), keepLine);
-    }
-  });
-
-  qs = new QuoteScanner(code);
-
-  // Remove line comment
-  code = code.replace(/(^|[^\\])\/\/.*([\r\n])/g, function(match, $1, $2, offset) {
-    if (qs.isIn(offset + $1.length)) {
-      return match;
-    } else {
-      return $1 + $2;
-    }
-  });
-
-  return code;
+  var js = new JsScanner(code);
+  
+  return scanner(js, code, keepLine);
 };
 
 /**
@@ -77,7 +72,11 @@ strip.js = function(code, keepLine) {
  */
 strip.html = function(code, keepLine) {
   return code.replace(/<!--[\s\S]*?-->/g, function(match) {
-    return blockReplace(match, keepLine);
+    if (keepLine) {
+      return match.replace(/[^\r\n]/g, ' ');
+    } else {
+      return '';
+    }
   });
 };
 
@@ -86,15 +85,9 @@ strip.html = function(code, keepLine) {
  * Strip css comments.
  */
 strip.css = function(code, keepLine) {
-  var qs = new QuoteScanner(code);
+  var css = new CssScaner(code);
 
-  return code.replace(/\/\*[\s\S]*?\*\//g, function(match, offset) {
-    if (qs.isIn(offset)) {
-      return match;
-    } else {
-      return blockReplace(match, keepLine);
-    }
-  });
+  return scanner(css, code, keepLine);
 };
 
 module.exports = strip;

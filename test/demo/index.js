@@ -1,4 +1,4 @@
-// comment /* 123 */
+// comment /* 123 */'
 var a = 5  // comment
 var a = 4;
    // comment
